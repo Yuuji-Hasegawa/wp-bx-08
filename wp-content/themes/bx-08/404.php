@@ -1,5 +1,21 @@
 <?php get_header();
 $protocol = empty($_SERVER["HTTPS"]) ? "http://" : "https://";?>
+<div class="c-puton c-puton--filter js-pull-view">
+  <picture class="o-frame o-frame--switch-l">
+    <source type="image/avif"
+      srcset="<?php echo get_template_directory_uri();?>/img/hero.avif" />
+    <source type="image/webp"
+      srcset="<?php echo get_template_directory_uri();?>/img/hero.webp" />
+    <img
+      src="<?php echo get_template_directory_uri();?>/img/hero.png"
+      width="100%" height="100%" decoding="async" fetchpriority="high" alt="" />
+  </picture>
+  <div class="c-puton__inner o-cover">
+    <div class="c-hero-copy o-cover__middle js-fade-up">
+      <span class="c-display-l u-text-weight-b u-font-en-con">Not found.</span>
+    </div>
+  </div>
+</div>
 <div class="o-box o-box--transparent o-center u-bg-qua u-pb-2xl">
   <h1 class="c-heading u-text-weight-b">お探しのページは見つかりませんでした。</h1>
   <p class="c-content-l">

@@ -36,7 +36,33 @@ function create_post_type()
           'supports' => array('title','editor')
         )
     );
+    register_post_type(
+        'menu',
+        array(
+      'labels' => array(
+          'name' => 'メニュー',
+          'singular_name' => 'メニュー',
+          'add_new_item' => 'メニューの新規追加',
+          'edit_item' => 'メニューの編集'
+      ),
+      'has_archive' => true,
+      'public' => true,
+      'show_ui' => true,
+      'menu_position' => 10,
+      'supports' => array('title','thumbnail'),
+      'menu_icon'   => 'dashicons-beer',
+      )
+    );
 }
+function my_redirect_404()
+{
+    if (is_singular('menu')) {
+        global $wp_query;
+        $wp_query->set_404();
+        status_header(404);
+    }
+}
+add_action('template_redirect', 'my_redirect_404');
 function custom_post_type_link($link, $post)
 {
     if ($post->post_type === 'news') {
@@ -66,9 +92,10 @@ add_filter('register_post_type_args', 'post_has_archive', 10, 2);
 
 function add_my_box()
 {
-    $addtype = array( 'post', 'page', 'news');
+    $addtype = array( 'post', 'page', 'news', 'menu');
     add_meta_box('meta_info', 'SEO', 'meta_info_form', $addtype, 'side');
     add_meta_box('meta_blogs', '追加情報', 'meta_blogs_form', 'post', 'normal');
+    add_meta_box('meta_menu', 'メニュー詳細', 'meta_menu_form', 'menu', 'normal');
 }
 add_action('admin_menu', 'add_my_box');
 
@@ -137,6 +164,16 @@ function meta_blogs_form()
   style="width: 100%;margin: 0 0 8px;" />
 <?php
 }
+function meta_menu_form()
+{
+    global $post;
+    $menu_price = get_post_meta($post->ID, 'menu_price', true); ?>
+<h3 style="font-size: 14px; margin: 0 0 8px;">価格（数字で入力してください）</h3>
+<input type="text" name="menu_price"
+  value="<?php echo esc_html($menu_price); ?>"
+  style="width: 100%;margin: 0 0 8px;" />
+<?php
+}
 
 function save_meta_info($post_id)
 {
@@ -169,6 +206,11 @@ function save_meta_info($post_id)
         update_post_meta($post_id, 'recommend_heading', $_POST['recommend_heading']);
     } else {
         delete_post_meta($post_id, 'recommend_heading');
+    }
+    if (isset($_POST['menu_price'])) {
+        update_post_meta($post_id, 'menu_price', $_POST['menu_price']);
+    } else {
+        delete_post_meta($post_id, 'menu_price');
     }
 }
 add_action('save_post', 'save_meta_info');

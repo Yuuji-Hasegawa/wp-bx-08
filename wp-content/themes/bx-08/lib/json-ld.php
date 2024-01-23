@@ -61,6 +61,16 @@ function set_bread_json()
                 )
             );
             $array = array_merge($array, $child);
+        } elseif (is_post_type_archive('menu')) {
+            $child[] = array(
+                "@type" => "ListItem",
+                "position" => 2,
+                "item" => array(
+                    "@id" => esc_url(home_url('/menu/')),
+                    "name" => esc_attr('メニュー')
+                )
+            );
+            $array = array_merge($array, $child);
         } elseif (is_tag()) {
             $parent[] = array(
                 "@type" => "ListItem",

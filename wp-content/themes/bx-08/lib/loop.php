@@ -15,7 +15,7 @@ function get_front_news()
         $output = '<ul class="o-stack o-stack--m u-mb-l">';
         while ($the_query->have_posts()) {
             $the_query->the_post();
-            $output .= '<li class="o-sidebar">
+            $output .= '<li class="o-sidebar u-fade-up">
             <time class="c-content-l u-font-en-con u-text-weight-b" datetime="' . get_the_time('Y-m-d') . '">' . get_the_time('Y.m.d') . '</time>
             <a href="' . get_the_permalink() . '" class="o-sidebar__grow o-sidebar__grow--news c-content-l c-text-link u-text-weight-b">
             ' . get_the_title() . '
@@ -24,23 +24,74 @@ function get_front_news()
         }
         $output .= '</ul>';
         wp_reset_postdata();
-        $output .= '<div class="u-text-right">
-        <a class="o-icon-parent c-content-l c-text-link u-text-weight-b"
+        $output .= '<div class="u-text-center js-fade-up">
+        <a class="o-box o-box--button o-box--rect-button o-box--ghost-button u-font-en-con"
           href="' . home_url('/news/') . '">
-          一覧を見る
-          <svg class="o-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512">
-            <!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc.-->
-            <path
-              d="M64 448c-8.188 0-16.38-3.125-22.62-9.375c-12.5-12.5-12.5-32.75 0-45.25L178.8 256L41.38 118.6c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0l160 160c12.5 12.5 12.5 32.75 0 45.25l-160 160C80.38 444.9 72.19 448 64 448z"
-              fill="currentColor"></path>
-          </svg>
+          MORE
         </a>
       </div>';
     }
     if ($output) {
         return $output;
     } else {
-        return '<p class="c-content-l">ニュースはまだありません。</p>';
+        return '<p class="c-content-l js-fade-up">ニュースはまだありません。</p>';
+    }
+}
+function get_front_menu()
+{
+    global $post;
+    $output = '';
+    $args = array(
+        'post_type' => 'menu',
+        'posts_per_page' => 3,
+        'orderby' => 'date',
+        'order' => 'DESC',
+        'no_found_rows' => true
+    );
+    $the_query = new WP_Query($args);
+    if ($the_query->have_posts()) {
+        $output = '<ul class="o-grid o-grid--tri u-mb-xl js-pull-view" id="photos">';
+        while ($the_query->have_posts()) {
+            $the_query->the_post();
+            if(has_post_thumbnail()) {
+                $url = get_the_post_thumbnail_url($post->ID, 'full');
+            } else {
+                $url = get_template_directory_uri() . '/img/thumb.png?' . date("YmdHis");
+            }
+            $price = '';
+            if(get_post_meta($post->ID, 'product_price', true)) {
+                $price = number_format(intval(get_post_meta($post->ID, 'product_price', true)));
+            } else {
+                $price = 0;
+            }
+            $output .= '<li class="o-stack o-stack--l">
+            <a href="' . $url . '" class="c-lightbox-photo">
+              ' . get_thumb() . '
+            </a>
+            <div class="o-stack o-stack--s">
+              <h3 class="c-display-2xs u-text-weight-b">' . get_the_title() . '</h3>
+              <div class="u-text-right u-text-weight-m">
+                <span class="c-content-l u-text-weight-b">
+                  <span class="c-display-s u-font-en-con">' . $price . '</span>円
+                </span>
+                <span class="c-suppl-l">（税込）</span>
+              </div>
+            </div>
+          </li>';
+        }
+        $output .= '</ul>';
+        wp_reset_postdata();
+        $output .= '<div class="u-text-center js-fade-up">
+        <a class="o-box o-box--button o-box--rect-button u-bg-invert u-font-en-con"
+          href="' . home_url('/menu/') . '">
+          MORE
+        </a>
+      </div>';
+    }
+    if ($output) {
+        return $output;
+    } else {
+        return '<p class="c-content-l js-fade-up">メニューはまだありません。</p>';
     }
 }
 function get_loop_cat()
@@ -78,8 +129,8 @@ function get_related_loop()
     );
     $the_query = new WP_Query($args);
     if ($the_query->have_posts()) {
-        $output = '<h2 class="c-sec-heading u-text-weight-b">関連記事</h2>
-        <ul class="o-grid o-grid--tri">';
+        $output = '<h2 class="c-sec-heading u-text-weight-b js-fade-up">関連記事</h2>
+        <ul class="o-grid o-grid--tri js-pull-view">';
         while ($the_query->have_posts()) {
             $the_query->the_post();
             $output .= '<li>
@@ -120,8 +171,8 @@ function get_last_loop()
     );
     $the_query = new WP_Query($args);
     if ($the_query->have_posts()) {
-        $output = '<h2 class="c-sec-heading u-text-weight-b">最新記事</h2>
-        <ul class="o-grid o-grid--tri">';
+        $output = '<h2 class="c-sec-heading u-text-weight-b js-fade-up">最新記事</h2>
+        <ul class="o-grid o-grid--tri js-pull-view">';
         while ($the_query->have_posts()) {
             $the_query->the_post();
             $output .= '<li>
@@ -163,8 +214,8 @@ function get_popular_loop()
     );
     $the_query = new WP_Query($args);
     if ($the_query->have_posts()) {
-        $output = '<h2 class="c-sec-heading u-text-weight-b">人気記事</h2>
-        <ul class="o-grid o-grid--quart">';
+        $output = '<h2 class="c-sec-heading u-text-weight-b js-fade-up">人気記事</h2>
+        <ul class="o-grid o-grid--quart js-pull-view">';
         while ($the_query->have_posts()) {
             $the_query->the_post();
             $output .= '<li>
